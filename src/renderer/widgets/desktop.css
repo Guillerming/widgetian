@@ -1,0 +1,213 @@
+/*
+ * The widgets window: transparent. Columns share the width equally; each column stacks its widgets
+ * in order. Glass tokens are shared by every widget.
+ */
+:root {
+  --columns: 5;
+  --edge: 24px;
+  --gap: 12px;
+
+  --ink: #fff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --faint: rgba(255, 255, 255, 0.5);
+  --glass: rgba(255, 255, 255, 0.045);
+  --highlight: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.14);
+  --track: rgba(255, 255, 255, 0.16);
+  --hover: rgba(255, 255, 255, 0.08);
+  --good: #4ade80;
+  --wait: #fcd34d;
+  --bad: #e5283a;
+  --on-tone: rgba(0, 0, 0, 0.78);
+  --radius: 24px;
+  --duration-fast: 150ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ink);
+  user-select: none;
+  cursor: default;
+}
+
+/* Screenshots of the widgets (capture mode) get a wallpaper-like backdrop. */
+body.preview {
+  background: radial-gradient(circle at 20% 20%, #ff9a54 0, transparent 55%),
+    radial-gradient(circle at 80% 30%, #85c8e8 0, transparent 55%), linear-gradient(135deg, #fa4b3e, #285c9e);
+}
+
+p, h1, h2, h3, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; }
+
+.columns {
+  position: fixed;
+  inset: var(--edge) var(--edge) auto var(--edge);
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: start;
+  pointer-events: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+.widget {
+  pointer-events: auto;
+  min-width: 0;
+  animation: widget-in 420ms var(--ease-out-expo) both;
+}
+
+@keyframes widget-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+}
+
+/* ---------- Glass card ---------- */
+.glass {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, var(--highlight), transparent 42%), var(--glass);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 12px;
+}
+
+.eyebrow {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.aside {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.card-body { margin-top: 12px; }
+.card-head:has(.eyebrow:empty):has(.aside:empty) { display: none; }
+.card-head:has(.eyebrow:empty):has(.aside:empty) + .card-body { margin-top: 0; }
+
+.notice {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* ---------- Rings ---------- */
+.ring {
+  --tone: var(--ink);
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  color: var(--tone);
+}
+.ring[data-tone="good"] { --tone: var(--good); }
+.ring[data-tone="wait"] { --tone: var(--wait); }
+.ring[data-tone="bad"] { --tone: var(--bad); }
+.ring > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  fill: none;
+}
+.ring-track { stroke: var(--track); }
+.ring[data-tone="unknown"] .ring-track { stroke-dasharray: 3 5; }
+.ring-arc {
+  stroke: var(--tone);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 600ms var(--ease-out-expo);
+}
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Buttons inside widgets ---------- */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--duration-fast), background var(--duration-fast),
+    transform var(--duration-fast) var(--ease-out-expo);
+}
+.icon-button:hover { color: var(--ink); background: var(--hover); }
+.icon-button:active { transform: scale(0.92); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 6px; }
+
+/* ---------- A widget that failed to load ---------- */
+.widget-error small { display: block; margin-top: 6px; font-size: 10px; color: var(--faint); }
+
+/* ---------- Signature ---------- */
+.byline {
+  position: fixed;
+  left: var(--edge);
+  bottom: var(--edge);
+  line-height: 1;
+  pointer-events: auto;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+.byline strong { font-weight: 600; color: rgba(255, 255, 255, 0.85); }
+.byline:hover,
+.byline:hover strong { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .widget { animation: none; }
+  .ring-arc { transition: none; }
+}

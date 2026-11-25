@@ -1,0 +1,119 @@
+.todo { padding: 18px 14px 12px; }
+.todo .card-head { padding: 0 6px; }
+.todo .card-body { margin-top: 8px; }
+.todo .items { display: flex; flex-direction: column; gap: 1px; }
+.todo .empty { padding: 6px; font-size: 12px; color: var(--muted); }
+
+.todo .item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 6px;
+  border-radius: 9px;
+  transition: background var(--duration-fast);
+}
+.todo .item-head:hover { background: var(--hover); }
+
+.todo .check {
+  flex: 0 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  padding: 0;
+  border: 1.5px solid var(--muted);
+  border-radius: 6px;
+  background: none;
+  color: transparent;
+  cursor: pointer;
+  transition: background var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
+}
+.todo .check:hover { border-color: var(--ink); }
+.todo .item[data-done="true"] .check { border-color: var(--good); background: var(--good); color: var(--on-tone); }
+
+.todo .text {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: default;
+}
+.todo .text[aria-expanded] { cursor: pointer; }
+.todo .item[data-done="true"] .text { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+.todo .chevron { display: inline-flex; color: var(--muted); transition: transform var(--duration-fast) var(--ease-out-expo); }
+.todo .text[aria-expanded="true"] .chevron { transform: rotate(90deg); }
+
+.todo .remove { opacity: 0; padding: 4px; }
+.todo .item-head:hover .remove,
+.todo .remove:focus-visible { opacity: 1; }
+
+.todo .note { margin: 2px 6px 8px 32px; }
+.todo .note pre {
+  max-height: 220px;
+  margin: 0;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  font: 11px/1.5 ui-monospace, "SF Mono", Menlo, monospace;
+  white-space: pre-wrap;
+  user-select: text;
+}
+.todo .note-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.todo .copy,
+.todo .clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--hover);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.todo .copy:hover,
+.todo .clear:hover { background: var(--highlight); }
+
+.todo .add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 7px 8px 7px 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+.todo .add-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+}
+.todo .add-input::placeholder { color: var(--faint); }
+.todo .add:focus-within { background: rgba(255, 255, 255, 0.1); }
+
+.todo .todo-footer { display: flex; justify-content: flex-end; margin-top: 8px; padding: 0 2px; }
+.todo .todo-footer:empty { display: none; }

@@ -1,0 +1,247 @@
+.status { padding: 18px 20px 16px; }
+.status .card-body { margin-top: 0; }
+.status [data-tone="none"] { --tone: var(--ink); --tone-soft: var(--track); }
+.status [data-tone="good"] { --tone: var(--good); --tone-soft: rgba(74, 222, 128, 0.16); }
+.status [data-tone="wait"] { --tone: var(--wait); --tone-soft: rgba(252, 211, 77, 0.16); }
+/* Failing reads as a white disc with a red mark: red on a red wallpaper would vanish. */
+.status [data-tone="bad"] { --tone: var(--ink); --tone-soft: rgba(229, 40, 58, 0.22); --on-tone: var(--bad); }
+
+.status .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+/* An image keeps its proportions, so a wordmark works as well as a square icon. */
+.status .logo { flex: 0 0 auto; height: 22px; max-width: 100%; border-radius: 6px; object-fit: contain; }
+.status img.logo { border-radius: 4px; }
+.status .logo-text {
+  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.status .brand-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.status .blocks > .notice { margin-top: 14px; }
+.status .blocks > .link-button { margin-top: 4px; font-size: 12px; }
+
+.status .hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 0;
+}
+.status .hero-text { min-width: 0; }
+.status .hero-text p { overflow: hidden; text-overflow: ellipsis; }
+.status .hero-text h2 { font-size: 21px; font-weight: 500; letter-spacing: -0.6px; }
+.status .hero-text p { margin-top: 4px; font-size: 11.5px; line-height: 1.4; color: var(--muted); }
+
+.status .status-ring {
+  position: relative;
+  flex: 0 0 68px;
+  height: 68px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--tone-soft);
+  color: var(--tone);
+  cursor: pointer;
+  transition: transform 200ms var(--ease-out-expo);
+}
+.status .status-ring[disabled] { cursor: default; }
+.status .status-ring > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  fill: none;
+  stroke-width: 4;
+}
+.status .status-ring .ring-track { stroke: var(--track); }
+.status .status-ring .ring-arc { stroke: var(--tone); stroke-linecap: round; }
+.status .status-ring .ring-state,
+.status .status-ring .ring-action {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--duration-fast), transform 200ms var(--ease-out-expo);
+}
+.status .status-ring .ring-state {
+  inset: 12px;
+  border-radius: 50%;
+  background: var(--tone);
+  color: var(--on-tone);
+}
+.status .status-ring .ring-action { opacity: 0; transform: rotate(-90deg); color: var(--ink); }
+.status .status-ring:hover:not([disabled]) { transform: scale(1.05); }
+.status .status-ring:hover:not([disabled]) .ring-state { opacity: 0; }
+.status .status-ring:hover:not([disabled]) .ring-action { opacity: 1; transform: rotate(0); }
+.status .status-ring:active:not([disabled]) { transform: scale(0.96); }
+.status .status-ring[data-running] > svg { animation: status-spin 1.1s linear infinite; }
+.status .status-ring[data-running] .ring-state { animation: status-pulse 1.6s ease-in-out infinite; }
+
+.status .checks li,
+.status .checks li > button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  font-size: 12px;
+}
+.status .checks li { padding: 4px 0; }
+.status .checks li > button {
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.status .check-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--tone);
+  color: var(--on-tone);
+}
+.status .check-label { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.status .checks li[data-tone="bad"] .check-label { font-weight: 600; }
+.status .check-detail {
+  margin-left: auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.status .check-link {
+  display: flex;
+  margin-left: -3px;
+  color: var(--muted);
+  opacity: 0.55;
+  transition: opacity var(--duration-fast), transform 200ms var(--ease-out-expo);
+}
+.status .checks li > button:hover .check-link { opacity: 1; transform: translate(1px, -1px); }
+
+.status .checks li[data-running] .check-mark { animation: status-pulse 1.6s ease-in-out infinite; }
+.status .checks li[data-tone="none"] .check-mark { background: var(--track); }
+
+/* ---------- Blocks ---------- */
+.status .block { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.status .tab-panel > .block:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.status .block.only-rows + .block.only-rows { margin-top: 0; padding-top: 0; border-top: 0; }
+.status .block > * + *, .status .tab-panel > * + * { margin-top: 12px; }
+.status .block-title,
+.status .item-list h3 {
+  margin: 0 0 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.status .block-text { font-size: 12px; line-height: 1.45; color: var(--muted); white-space: pre-line; overflow-wrap: anywhere; }
+.status[data-busy] .hero { opacity: 0.7; transition: opacity 300ms; }
+
+/* Tabs */
+.status .tabs { display: flex; gap: 4px; margin-bottom: 12px; padding: 3px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); }
+.status .tabs button {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.status .tabs button:hover { color: var(--ink); }
+.status .tabs button[aria-selected="true"] { background: rgba(255, 255, 255, 0.14); color: var(--ink); }
+.status .tabs button[data-live]::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--good);
+  vertical-align: 1px;
+}
+
+/* Chart */
+.status .chart { display: block; width: 100%; padding: 0; border: 0; background: none; text-align: left; }
+.status button.chart { cursor: pointer; }
+.status .chart-head { display: flex; align-items: baseline; gap: 8px; }
+.status .chart-label { font-size: 12px; color: var(--muted); }
+.status .chart-head strong { font-size: 21px; font-weight: 500; letter-spacing: -0.6px; font-variant-numeric: tabular-nums; }
+.status .chart-meta { margin-left: auto; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status .chart-meta b { font-weight: 400; }
+.status .chart-meta b[data-live] { font-weight: 600; color: var(--good); }
+.status .chart-line { display: block; width: 100%; height: 52px; margin-top: 10px; overflow: visible; color: var(--good); }
+.status .chart-line path { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.status .chart-line .area { stroke: none; }
+.status .chart-line .line { stroke: var(--good); stroke-width: 2; }
+.status .chart-line .line-dashed { stroke: rgba(255, 255, 255, 0.4); stroke-width: 1.2; stroke-dasharray: 2 3; }
+.status .chart-line .last { stroke: var(--good); stroke-width: 7; }
+.status .chart-axis { display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--muted); }
+
+/* List */
+.status .item-list li,
+.status .item-list li > button { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 12px; }
+.status .item-list li { padding: 3px 0; opacity: 0.65; }
+.status .item-list li[data-live] { opacity: 1; }
+.status .item-list li > button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.status .item-list li:has(> button):hover { opacity: 1; }
+.status .item-icon { flex: 0 0 auto; font-size: 13px; line-height: 1; }
+.status .item-label { flex: 0 1 auto; min-width: 0; max-width: 45%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 600; }
+.status .item-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; }
+.status .item-detail { margin-left: auto; font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+.status .item-list li[data-live] .item-detail { font-weight: 600; color: var(--good); }
+.status .item-empty { margin: 2px 0 0; font-size: 11.5px; color: var(--muted); }
+
+/* Stats, progress, buttons */
+.status .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; margin: 0; }
+.status .stats dt { font-size: 11px; color: var(--muted); }
+.status .stats dd { margin: 2px 0 0; font-size: 19px; font-weight: 500; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+.status .stats dd small { display: block; font-size: 10.5px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.status .stats [data-tone="good"] dd, .status .stats [data-tone="wait"] dd { color: var(--tone); }
+.status .stats [data-tone="bad"] dd { text-decoration: underline wavy var(--bad); text-underline-offset: 4px; }
+.status .progress-head { display: flex; gap: 8px; font-size: 12px; }
+.status .progress-track { height: 5px; margin-top: 6px; overflow: hidden; border-radius: 3px; background: var(--track); }
+.status .progress-track span { display: block; height: 100%; border-radius: 3px; background: var(--tone, var(--ink)); }
+.status .buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.status .buttons button {
+  padding: 5px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo);
+}
+.status .buttons button:hover { background: rgba(255, 255, 255, 0.24); }
+.status .buttons button:active { transform: scale(0.96); }
+
+@keyframes status-spin { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
+@keyframes status-pulse { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) {
+  .status .status-ring[data-running] > svg,
+  .status .status-ring[data-running] .ring-state,
+  .status .checks li[data-running] .check-mark { animation: none; }
+}

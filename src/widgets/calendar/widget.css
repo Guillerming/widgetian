@@ -1,0 +1,54 @@
+.calendar { padding: 18px 14px 12px; }
+.calendar .card-head { padding: 0 6px; }
+.calendar .card-body { margin-top: 4px; }
+.calendar .notice { margin: 8px 6px 4px; }
+.calendar .link-button { margin: 4px 6px; font-size: 12px; }
+.calendar .day + .day {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.calendar .day h2 {
+  margin: 8px 6px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+}
+.calendar li > button,
+.calendar li > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  font-size: 12.5px;
+  text-align: left;
+}
+.calendar li > button {
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.calendar li > button:hover { background: var(--hover); }
+.calendar li > button:active { transform: scale(0.99); }
+.calendar li i {
+  flex: 0 0 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.calendar time {
+  flex: 0 0 auto;
+  min-width: 42px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.calendar .separator { color: var(--muted); }
+.calendar .title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.calendar li[data-now] time { color: var(--ink); font-weight: 600; }
+.calendar li[data-now] .title { font-weight: 600; }

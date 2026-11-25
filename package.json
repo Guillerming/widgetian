@@ -1,0 +1,81 @@
+{
+  "name": "widgetian",
+  "productName": "Widgetian",
+  "version": "0.1.0",
+  "description": "Glass desktop widgets for macOS.",
+  "author": "Guillerming <https://guillerming.es>",
+  "homepage": "https://guillerming.es/projects/widgetian",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "src/main/index.js",
+  "scripts": {
+    "dev": "electron . --dev",
+    "start": "electron .",
+    "test": "node --test \"test/*.test.js\"",
+    "dist": "node scripts/dist.js"
+  },
+  "dependencies": {
+    "ical.js": "2.2.1",
+    "koffi": "3.3.6",
+    "music-metadata": "12.3.5"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "es.guillerming.widgetian",
+    "productName": "Widgetian",
+    "copyright": "© 2026 Guillerming",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json",
+      "!**/*.test.js"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/claude-statusline.cjs",
+        "to": "claude-statusline.cjs"
+      },
+      {
+        "from": "resources/script-runner.cjs",
+        "to": "script-runner.cjs"
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/koffi/**",
+      "node_modules/@koromix/**"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg"
+        },
+        {
+          "target": "zip"
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "minimumSystemVersion": "13.0",
+      "identity": "-",
+      "extendInfo": {
+        "LSUIElement": true,
+        "NSLocationUsageDescription": "Widgetian uses your location to show the weather where you are.",
+        "NSLocationWhenInUseUsageDescription": "Widgetian uses your location to show the weather where you are."
+      },
+      "hardenedRuntime": false
+    },
+    "dmg": {
+      "title": "Widgetian ${version}",
+      "writeUpdateInfo": false
+    }
+  }
+}

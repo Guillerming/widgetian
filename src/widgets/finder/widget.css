@@ -1,0 +1,50 @@
+.finder {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 14px 20px 14px 14px;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 200ms var(--ease-out-expo);
+}
+.finder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--hover);
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+  pointer-events: none;
+}
+.finder:hover::after { opacity: 1; }
+.finder:active { transform: scale(0.985); }
+.finder:focus-visible { border-radius: var(--radius); outline-offset: -2px; }
+.finder .folder {
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.finder .finder-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.finder strong { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+.finder small { margin-top: 2px; font-size: 11px; color: var(--muted); }
+.finder .go {
+  display: flex;
+  color: var(--muted);
+  transition: transform 200ms var(--ease-out-expo), color var(--duration-fast);
+}
+.finder:hover .go { color: var(--ink); transform: translate(2px, -2px); }
+@media (prefers-reduced-motion: reduce) {
+  .finder,
+  .finder .go { transition: none; }
+}
