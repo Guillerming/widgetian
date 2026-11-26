@@ -8,6 +8,7 @@ import { resourceFile } from "./resources.js";
 import { readSource, defaultClaudeLimitsFile } from "./sources/index.js";
 import { readStatusBlock, testScript } from "./sources/status.js";
 import { canHideDesktopIcons } from "./desktop-icons.js";
+import { checkForUpdates, installUpdate, updateState } from "./updater.js";
 import { getSettingsWindow, listDisplays, openSettings, setHotRects } from "./windows.js";
 
 const SELF_SAVING_TYPES = new Set(["todo"]);
@@ -168,6 +169,19 @@ export const registerIpc = ({ store }) => {
   handle("settings:open", (_event, section) => {
     openSettings(typeof section === "string" ? section : "");
     return true;
+  });
+
+  handle("update:state", () => updateState());
+
+  handle("update:check", (event) => {
+    requireSettings(event);
+    return checkForUpdates();
+  });
+
+  // Quits the app when it installs: only from the settings window, where the user clicked.
+  handle("update:install", (event) => {
+    requireSettings(event);
+    return installUpdate();
   });
 
   handle("app:info", () => ({

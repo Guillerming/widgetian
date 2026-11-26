@@ -7,6 +7,7 @@ import { readCalendars } from "./calendar.js";
 import { countImages, readLogo, readMusicLibrary, readWallpaperImages } from "./media.js";
 import { readPower } from "./power.js";
 import { readStatusBlock } from "./status.js";
+import { readSystem } from "./system.js";
 import { placeName } from "./place-name.js";
 import { readForecast, searchPlaces } from "./weather.js";
 
@@ -25,6 +26,8 @@ const statusBlockTtl = ({ block: { every, checks = [] } }) => {
 /** name → { read(params), ttl(params) in ms } */
 const SOURCES = {
   power: { read: readPower, ttl: () => 30 * SECOND },
+  // CPU load is measured between two readings: closer than this, it is mostly noise.
+  system: { read: readSystem, ttl: () => 2 * SECOND - 100 },
   weather: { read: readForecast, ttl: () => 15 * MINUTE },
   places: { read: ({ query }) => searchPlaces(query), ttl: () => 10 * MINUTE },
   "place-name": { read: placeName, ttl: () => 24 * 60 * MINUTE },

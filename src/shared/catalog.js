@@ -124,6 +124,37 @@ export const CATALOG = {
     ],
   },
 
+  system: {
+    name: "System",
+    description: "CPU load per core and temperature, memory and free disk space.",
+    multiple: false,
+    defaults: { every: 3, showCores: true, showTemperature: true, units: "celsius", disks: "startup" },
+    fields: [
+      { key: "every", label: "Refresh every (seconds)", type: "number", min: 2, max: 60 },
+      { key: "showCores", label: "Show each core", type: "boolean" },
+      { key: "showTemperature", label: "Show the CPU temperature", type: "boolean", help: "Apple silicon only: Intel Macs do not share it without administrator rights." },
+      {
+        key: "units",
+        label: "Temperature units",
+        type: "select",
+        options: [
+          { value: "celsius", label: "°C" },
+          { value: "fahrenheit", label: "°F" },
+        ],
+      },
+      {
+        key: "disks",
+        label: "Disks",
+        type: "select",
+        options: [
+          { value: "startup", label: "Startup disk only" },
+          { value: "all", label: "Every disk you can write to" },
+        ],
+        help: "Free space as Finder counts it, with the space macOS can reclaim.",
+      },
+    ],
+  },
+
   music: {
     name: "Music",
     description: "Plays the songs in a folder, with shuffle and an artist lock. Media keys work.",

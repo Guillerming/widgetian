@@ -42,6 +42,12 @@ contextBridge.exposeInMainWorld("widgetian", {
   copy: (text) => call("clipboard:write", text),
   openSettings: (section) => call("settings:open", section),
   appInfo: () => call("app:info"),
+  updates: {
+    state: () => call("update:state"),
+    check: () => call("update:check"),
+    install: () => call("update:install"),
+    onChange: subscribe("update:changed"),
+  },
   setHotRects: (rects) => ipcRenderer.send("desktop:hot-rects", rects),
   onDisplays: subscribe("displays:changed"),
   onSettingsSection: subscribe("settings:section"),

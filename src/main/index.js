@@ -4,12 +4,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, Menu, Tray, nativeImage, powerMonitor, screen, session, shell } from "electron";
+import { app, Menu, Notification, Tray, nativeImage, powerMonitor, screen, session, shell } from "electron";
 import { ConfigStore } from "./config-store.js";
 import { registerIpc } from "./ipc.js";
 import { PRODUCT } from "./product.js";
 import { APP_URL, handleProtocols, registerSchemes } from "./protocols.js";
 import { syncDesktopIcons } from "./desktop-icons.js";
+import { startUpdater, updateState } from "./updater.js";
 import { broadcast, listDisplays, openSettings, reloadDesktop, setWidgetsHidden, startPointerTracking, syncDesktop } from "./windows.js";
 
 const ASSETS = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../assets");
@@ -56,8 +57,14 @@ const trayImage = () => {
   return image;
 };
 
+const updateItems = () => {
+  const { version } = updateState();
+  return version ? [{ label: `Update to Widgetian ${version}…`, click: () => openSettings("general") }, { type: "separator" }] : [];
+};
+
 const buildTrayMenu = () =>
   Menu.buildFromTemplate([
+    ...updateItems(),
     { label: "Settings…", accelerator: "Command+,", click: () => openSettings() },
     {
       label: widgetsHidden ? "Show Widgets" : "Hide Widgets",
@@ -91,6 +98,39 @@ const debounce = (task, ms) => {
   };
 };
 
+/** Arguments the app keeps when the updater opens it again (test instances stay test instances). */
+const relaunchArgs = () =>
+  [
+    flag("user-data") ? `--user-data=${path.resolve(flag("user-data"))}` : "",
+    flag("update-feed") ? `--update-feed=${flag("update-feed")}` : "",
+  ].filter(Boolean);
+
+const announceUpdate = ({ version }) => {
+  if (!Notification.isSupported()) return;
+  const notification = new Notification({ title: `Widgetian ${version} is available`, body: "Click to see what's new and install it." });
+  notification.on("click", () => openSettings("general"));
+  notification.show();
+};
+
+const runUpdater = () => {
+  let menuVersion = "";
+  startUpdater({
+    feed: flag("update-feed"),
+    relaunchArgs: relaunchArgs(),
+    // Testing only: install whatever the test feed offers, without clicking.
+    installRightAway: Boolean(flag("update-feed")) && process.argv.includes("--update-install"),
+    isEnabled: () => store.get().general.checkForUpdates,
+    onChange: (state) => {
+      broadcast("update:changed", state);
+      if (state.version === menuVersion) return;
+      menuVersion = state.version;
+      tray?.setContextMenu(buildTrayMenu());
+    },
+    onAvailable: announceUpdate,
+    openPage: (url) => shell.openExternal(url),
+  });
+};
+
 async function start() {
   handleProtocols();
   allowGeolocationForOurPages();
@@ -113,6 +153,9 @@ async function start() {
   for (const event of ["display-added", "display-removed", "display-metrics-changed"]) screen.on(event, resync);
   powerMonitor.on("on-battery", () => broadcast("power:on-battery", true));
   powerMonitor.on("on-ac", () => broadcast("power:on-battery", false));
+
+  // Before captures too, so they show the update status.
+  runUpdater();
 
   if (flag("capture")) {
     const { runCapture } = await import("./capture.js");

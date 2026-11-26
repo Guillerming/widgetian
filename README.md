@@ -26,6 +26,7 @@ Widgetian starts at login (turn it off in **General**). It has no Dock icon.
 | Clock | Time, seconds and date, in any time zone. Add several for several cities. | 12/24 h, time zone, date format |
 | Weather | Now and the next days, from Open-Meteo (no account). | Automatic location or a city |
 | Power | Battery rings for this Mac and connected Bluetooth devices. | — |
+| System | CPU load per core and temperature (Apple silicon), memory as Activity Monitor counts it, free disk space as Finder counts it. | Off by default: add it in **Layout** |
 | Music | Plays a folder of songs: shuffle, artist lock, media keys, Now Playing. | A music folder |
 | Wallpaper picker | Swatches to switch the gradient wallpaper from the desktop. | — |
 | Calendar | Today's and the next days' events, the current one highlighted. | iCal addresses (Google, iCloud, Outlook…) |
@@ -127,6 +128,10 @@ npx electron scripts/make-icons.js         # regenerate build/icon.png and the m
 npm run dist                               # build the Apple Silicon and Intel installers in dist/
 ```
 
+To try the updater, build a packaged app, serve a JSON shaped like GitHub's latest release (its
+zip URLs on the same server) and open the app with `--user-data=/tmp/wt --update-feed=http://127.0.0.1:8765/latest.json`.
+Add `--update-install` to install what the feed offers without clicking.
+
 ### How it works
 
 ```
@@ -140,8 +145,11 @@ src/
                      also covers them, as macOS shows them again when it reveals the desktop
     config-store.js  config.json: load, save atomically, follow outside edits
     ipc.js           everything pages may ask for (validated here)
+    updater.js       daily check of GitHub's latest release; downloads the zip, checks its SHA-256,
+                     swaps the app and opens it again (update-release.js: the pure parts)
     protocols.js     app:// (pages) and media:// (music, pictures): no local server
-    sources/         data: power, weather, calendar, checks, umami, ai-usage, media
+    sources/         data: power, system, weather, calendar, checks, umami, ai-usage, media
+                     (mac-sensors.js reads temperatures and volumes through IOKit/Foundation)
   preload/         the only bridge pages get (window.widgetian)
   renderer/
     widgets/         the transparent desktop window: columns, mounting widgets
@@ -171,6 +179,20 @@ src/
 2. Create `src/widgets/<type>/widget.js` and `widget.css`.
 3. If it needs data from the Mac or the network, add a source in `src/main/sources/` and register it
    in `sources/index.js`.
+
+## Releasing
+
+1. Set the new `version` in `package.json` and commit it.
+2. `npm run dist` builds a `.dmg` and a `.zip` for each architecture in `dist/`.
+3. Publish a GitHub release (not a draft or pre-release) tagged `v<version>` with all four files:
+
+   ```bash
+   gh release create v0.2.0 dist/Widgetian-0.2.0-{arm64,x64}.{dmg,zip} --title "Widgetian 0.2.0" --notes-file notes.md
+   ```
+
+The installed apps find it within a day. People download the `.dmg`; the app updates itself from
+the `.zip` of its architecture, checked against the SHA-256 GitHub computes for it. A release
+without the zips is still announced, but only as a link to the release page.
 
 ## Before the first public release
 

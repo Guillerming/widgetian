@@ -150,7 +150,10 @@ ul { list-style: none; }
 .row.stacked .row-label { padding-top: 0; }
 .row-control { min-width: 0; }
 .help { margin-top: 6px; font-size: 11.5px; line-height: 1.45; color: var(--text-2); }
-.group-box > .help { padding: 0 14px 12px; border: 0; }
+.group-box > .help,
+.updates > .help { padding: 0 14px 12px; border: 0; }
+.help a { color: var(--accent); text-decoration: none; }
+.help a:hover { text-decoration: underline; }
 
 /* ---------- Controls ---------- */
 input[type="text"],

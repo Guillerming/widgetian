@@ -15,6 +15,7 @@ const DEFAULT_GENERAL = {
   timeFormat: "24h",
   openAtLogin: true,
   hideDesktopIcons: false,
+  checkForUpdates: true,
   // "primary" | "all" | "one"; displayId and displayLabel say which one.
   display: "primary",
   displayId: 0,
@@ -40,6 +41,7 @@ const STARTER_WIDGETS = [
   ["clock", 1, 1, true],
   ["weather", 1, 2, true],
   ["power", 1, 3, true],
+  ["system", 3, 3, false],
   ["music", 1, 4, false],
   ["wallpaper-picker", 1, 5, true],
   ["calendar", 2, 1, true],
@@ -150,6 +152,7 @@ export const normalizeConfig = (raw) => {
       timeFormat: oneOf(general.timeFormat, ["24h", "12h"], DEFAULT_GENERAL.timeFormat),
       openAtLogin: general.openAtLogin !== false,
       hideDesktopIcons: general.hideDesktopIcons === true,
+      checkForUpdates: general.checkForUpdates !== false,
       display: oneOf(general.display, ["primary", "all", "one"], DEFAULT_GENERAL.display),
       displayId: Number.isFinite(general.displayId) ? general.displayId : DEFAULT_GENERAL.displayId,
       displayLabel: text(general.displayLabel),

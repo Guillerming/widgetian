@@ -1,0 +1,131 @@
+.system .gauges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.system .gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  text-align: center;
+}
+.system .gauge-value {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+}
+.system .gauge strong {
+  margin-top: 7px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.system .gauge small {
+  max-width: 100%;
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+/* One bar per core; the fill scales from the bottom so only the compositor works. */
+.system .cores {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.system .core-group {
+  flex: var(--cores, 1) 1 0;
+  min-width: 0;
+}
+.system .core-bars {
+  display: flex;
+  gap: 3px;
+  height: 24px;
+}
+.system .core {
+  position: relative;
+  flex: 1 1 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--track);
+}
+.system .core-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ink);
+  transform: scaleY(var(--load, 0));
+  transform-origin: bottom;
+  transition: transform 600ms var(--ease-out-expo), background var(--duration-fast);
+}
+.system .core-fill[data-busy] { background: var(--wait); }
+.system .core-group[data-kind="efficiency"] .core-fill { opacity: 0.7; }
+.system .core-group small {
+  display: block;
+  margin-top: 6px;
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--faint);
+}
+
+/* Other disks, when the settings ask for them. */
+.system .volumes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.system .volumes:not(:empty) {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.system .volume {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+.system .volume + .volume { margin-top: 8px; }
+.system .volume-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.system .volume-free {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.system .volume-bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--track);
+}
+.system .volume-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform: scaleX(var(--used, 0));
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system .core-fill { transition: none; }
+}
