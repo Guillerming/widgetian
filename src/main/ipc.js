@@ -41,8 +41,8 @@ const CONFIGURED_SOURCES = {
   },
   music: (config, { widgetId }) => ({ folder: widgetSettings(config, widgetId, "music").folder }),
   ai: (config, { widgetId }) => {
-    const { claude, codex, claudeLimitsFile } = widgetSettings(config, widgetId, "ai");
-    return { claude, codex, claudeLimitsFile };
+    const { claude, codex, claudeLive, claudeLimitsFile } = widgetSettings(config, widgetId, "ai");
+    return { claude, codex, claudeLive, claudeLimitsFile };
   },
   images: (config) => ({ folder: config.wallpaper.imagesFolder }),
 };

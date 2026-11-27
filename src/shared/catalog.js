@@ -195,18 +195,25 @@ export const CATALOG = {
 
   ai: {
     name: "AI usage",
-    description: "What is left of your Claude Code and Codex plans, and whether they are working right now. Local files only.",
+    description: "What is left of your Claude Code and Codex plans, and whether they are working right now.",
     multiple: false,
-    defaults: { claude: true, codex: true, claudeLimitsFile: "" },
+    defaults: { claude: true, codex: true, claudeLive: false, claudeLimitsFile: "" },
     fields: [
       { key: "claude", label: "Show Claude", type: "boolean" },
+      {
+        key: "claudeLive",
+        label: "Claude's real usage",
+        type: "boolean",
+        help:
+          "Every 5 minutes, Widgetian asks Anthropic for the numbers Claude Code's /usage shows, with the login Claude Code keeps in your Keychain (macOS may ask you to allow it once). The login goes only to Anthropic and is never stored or renewed by Widgetian. This uses an endpoint Anthropic does not document, so it may stop working; then the statusline below takes over. Off: only the statusline, which runs in the terminal but not in Claude's desktop app.",
+      },
       { key: "codex", label: "Show ChatGPT (Codex)", type: "boolean" },
       {
         key: "claudeLimitsFile",
         label: "Claude limits file",
         type: "text",
         placeholder: "~/Library/Application Support/Widgetian/claude-limits.json",
-        help: "Written by the Claude Code statusline. Empty = Widgetian's own (see the README).",
+        help: "Written by the Claude Code statusline. Empty = Widgetian's own (see the README). Used when real usage is off or fails.",
       },
     ],
   },

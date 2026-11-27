@@ -1,10 +1,13 @@
-// AI plan usage from local files only (no tokens, no network).
+// AI plan usage.
 //   Codex writes its 5 h / weekly limits into its own session logs (~/.codex/sessions).
-//   Claude Code hands them to its statusline; resources/claude-statusline.cjs saves them to a file.
+//   Claude: with "claudeLive" on, asked to Anthropic with Claude Code's login (claude-usage.js), the
+//   same numbers as /usage. Otherwise, or while that fails, the file resources/claude-statusline.cjs
+//   saves from Claude Code's statusline (the terminal only: the desktop app runs no statusline).
 //   Activity (thinking / working / idle) comes from the newest session log of each tool.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { liveClaudeUsage } from "./claude-usage.js";
 
 const TAIL_BYTES = 256 * 1024;
 // A session untouched this long is idle even if its last step was a tool call (e.g. a prompt waiting).
@@ -138,10 +141,16 @@ const readCodex = (now) => {
   return { activity, limitsAt: null, fiveHour: null, week: null };
 };
 
-const readClaude = (now, limitsFile) => {
+const readClaude = async (now, limitsFile, live) => {
   const newest = newestClaudeFile();
   const fresh = newest !== null && now - newest.mtime < STALE_AFTER_MS;
-  const result = { activity: fresh ? claudeActivity(tailEntries(newest.file)) : "idle", limitsAt: null, fiveHour: null, week: null };
+  const activity = fresh ? claudeActivity(tailEntries(newest.file)) : "idle";
+  const result = { activity, limitsAt: null, fiveHour: null, week: null, error: "" };
+  if (live) {
+    const reading = await liveClaudeUsage();
+    if (reading.value) return { ...result, ...reading.value, error: reading.error };
+    result.error = reading.error;
+  }
   try {
     const saved = JSON.parse(fs.readFileSync(limitsFile, "utf8"));
     const limits = saved.rateLimits ?? {};
@@ -154,11 +163,11 @@ const readClaude = (now, limitsFile) => {
   return result;
 };
 
-/** @param {{ claude?: boolean, codex?: boolean, claudeLimitsFile: string }} params */
-export const readAiUsage = async ({ claude = true, codex = true, claudeLimitsFile }) => {
+/** @param {{ claude?: boolean, codex?: boolean, claudeLive?: boolean, claudeLimitsFile: string }} params */
+export const readAiUsage = async ({ claude = true, codex = true, claudeLive = false, claudeLimitsFile }) => {
   const now = Date.now();
   return {
-    claude: claude ? readClaude(now, expandHome(claudeLimitsFile)) : null,
+    claude: claude ? await readClaude(now, expandHome(claudeLimitsFile), claudeLive) : null,
     codex: codex ? readCodex(now) : null,
   };
 };

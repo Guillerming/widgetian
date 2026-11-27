@@ -3,6 +3,14 @@
 What changed in each version of Widgetian. The newest comes first; each release on GitHub uses its
 section as release notes (`npm run release-notes`).
 
+## 0.2.3 (unreleased)
+
+- **AI usage: Claude's real usage.** An option, off by default, that asks Anthropic every 5 minutes for
+  the numbers Claude Code's `/usage` shows, with the login Claude Code keeps in the Keychain. It works
+  with Claude's desktop app, which runs no statusline. The statusline stays as the fallback.
+- **AI usage: logos.** Claude and ChatGPT show their logos, and a window that has reset reads just
+  "5h" or "Week" (no more "fresh").
+
 ## 0.2.2 (2026-11-27)
 
 - **Layout: drag and drop works.** Drag a widget from "Add a widget" into a column, between

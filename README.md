@@ -31,7 +31,7 @@ Widgetian starts at login (turn it off in **General**). It has no Dock icon.
 | Wallpaper picker | Swatches to switch the gradient wallpaper from the desktop. | — |
 | Calendar | Today's and the next days' events, the current one highlighted. | iCal addresses (Google, iCloud, Outlook…) |
 | To do | A checklist you edit on the desktop. Items can carry a note to copy. | — |
-| AI usage | What is left of your Claude Code and Codex plans, and whether they are working. | Claude Code statusline (below) |
+| AI usage | What is left of your Claude Code and Codex plans, and whether they are working. | Claude: real usage (opt-in) or the statusline (below) |
 | Finder | Opens your Desktop folder in a Finder window, with one click. Pairs with **General › Hide desktop icons**. | — |
 | Service status | Anything about a website or service: health checks, Umami visits, your own JavaScript, in tabs. | Blocks (below) |
 
@@ -88,7 +88,14 @@ that action. Scripts and commands come only from your `config.json`: only paste 
 Codex writes its plan limits to its own logs, so ChatGPT works on its own. Claude Code only shares
 them with its statusline: **Settings › AI usage** shows the exact snippet to paste into
 `~/.claude/settings.json`. It runs a tiny script with Widgetian's own binary (no Python or Node
-needed), saves the two limits and prints nothing.
+needed), saves the two limits and prints nothing. The statusline runs only in the terminal, not in
+Claude's desktop app.
+
+**Claude's real usage** (off by default, in the widget's settings) asks Anthropic every 5 minutes
+for the numbers `/usage` shows, with the login Claude Code keeps in the Keychain, read through
+Apple's `security` tool as Claude Code does. The token is sent only to `api.anthropic.com`, never
+stored or renewed by Widgetian (renewing it would replace Claude Code's own login). The endpoint
+is not documented by Anthropic: if it stops answering, the statusline reading takes over.
 
 ## Configuration
 
