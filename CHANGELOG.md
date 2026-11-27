@@ -3,7 +3,7 @@
 What changed in each version of Widgetian. The newest comes first; each release on GitHub uses its
 section as release notes (`npm run release-notes`).
 
-## 0.2.3 (unreleased)
+## 0.2.3 (2026-11-27)
 
 - **AI usage: Claude's real usage.** An option, off by default, that asks Anthropic every 5 minutes for
   the numbers Claude Code's `/usage` shows, with the login Claude Code keeps in the Keychain. It works
