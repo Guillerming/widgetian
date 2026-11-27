@@ -5,6 +5,7 @@
 //   ctx.info                         facts from the main process (version, displays…)
 // Changes must be written as functions of the config they receive: typing does not redraw the page,
 // so a value remembered from when it was drawn may be old.
+import { aboutPage } from "./pages/about.js";
 import { advancedPage } from "./pages/advanced.js";
 import { generalPage } from "./pages/general.js";
 import { layoutPage } from "./pages/layout.js";
@@ -13,7 +14,9 @@ import { widgetPage } from "./pages/widget.js";
 
 const WIDGET_PREFIX = "widget:";
 
+// `apart`: a little space after it in the sidebar.
 export const SECTIONS = [
+  { id: "about", label: "About", page: aboutPage, apart: true },
   { id: "general", label: "General", page: generalPage },
   { id: "layout", label: "Layout", page: layoutPage },
   { id: "wallpaper", label: "Wallpaper", page: wallpaperPage },

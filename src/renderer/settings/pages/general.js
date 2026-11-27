@@ -1,6 +1,5 @@
 import { row, segmented, select, toggle } from "../fields.js";
 import { group, page, updatePart } from "../kit.js";
-import { updatesGroup } from "./updates.js";
 
 const LOCALES = [
   "ar", "bg-BG", "ca-ES", "cs-CZ", "da-DK", "de-AT", "de-CH", "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-IE", "en-IN",
@@ -70,7 +69,7 @@ export const generalPage = (ctx) => {
   };
   return page(
     "General",
-    "How Widgetian starts, how it writes dates and times, and how it stays up to date.",
+    "How Widgetian starts, how it writes dates and times, and where it shows widgets.",
     group(
       "",
       row("Open at login", toggle(settings.openAtLogin, (openAtLogin) => set({ openAtLogin })), {
@@ -90,6 +89,5 @@ export const generalPage = (ctx) => {
         help: ctx.info.canHideDesktopIcons ? iconsHelp : "Needs macOS 14 or later.",
       }),
     ),
-    updatesGroup(ctx),
   );
 };

@@ -68,10 +68,10 @@ const ctx = {
   go,
 };
 
-const navItem = ({ id, label }) =>
+const navItem = ({ id, label, apart }) =>
   h(
     "li",
-    {},
+    { class: apart ? "apart" : null },
     h("button", { type: "button", class: "nav-item", "aria-current": sidebarSection(section) === id ? "page" : null, onClick: () => go(id) }, label),
   );
 

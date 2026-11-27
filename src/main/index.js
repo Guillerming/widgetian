@@ -59,7 +59,7 @@ const trayImage = () => {
 
 const updateItems = () => {
   const { version } = updateState();
-  return version ? [{ label: `Update to Widgetian ${version}…`, click: () => openSettings("general") }, { type: "separator" }] : [];
+  return version ? [{ label: `Update to Widgetian ${version}…`, click: () => openSettings("about") }, { type: "separator" }] : [];
 };
 
 const buildTrayMenu = () =>
@@ -108,7 +108,7 @@ const relaunchArgs = () =>
 const announceUpdate = ({ version }) => {
   if (!Notification.isSupported()) return;
   const notification = new Notification({ title: `Widgetian ${version} is available`, body: "Click to see what's new and install it." });
-  notification.on("click", () => openSettings("general"));
+  notification.on("click", () => openSettings("about"));
   notification.show();
 };
 

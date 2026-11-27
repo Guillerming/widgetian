@@ -182,12 +182,14 @@ src/
 
 ## Releasing
 
-1. Set the new `version` in `package.json` and commit it.
+1. Set the new `version` in `package.json`, add its section at the top of
+   [CHANGELOG.md](CHANGELOG.md) and commit both.
 2. `npm run dist` builds a `.dmg` and a `.zip` for each architecture in `dist/`.
-3. Publish a GitHub release (not a draft or pre-release) tagged `v<version>` with all four files:
+3. Publish a GitHub release (not a draft or pre-release) tagged `v<version>` with all four files,
+   its changelog section as notes:
 
    ```bash
-   gh release create v0.2.0 dist/Widgetian-0.2.0-{arm64,x64}.{dmg,zip} --title "Widgetian 0.2.0" --notes-file notes.md
+   gh release create v0.2.1 dist/Widgetian-0.2.1-{arm64,x64}.{dmg,zip} --title "Widgetian 0.2.1" --notes "$(npm run -s release-notes)"
    ```
 
 The installed apps find it within a day. People download the `.dmg`; the app updates itself from

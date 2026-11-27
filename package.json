@@ -1,7 +1,7 @@
 {
   "name": "widgetian",
   "productName": "Widgetian",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Glass desktop widgets for macOS.",
   "author": "Guillerming <https://guillerming.es>",
   "homepage": "https://guillerming.es/projects/widgetian",
@@ -13,7 +13,8 @@
     "dev": "electron . --dev",
     "start": "electron .",
     "test": "node --test \"test/*.test.js\"",
-    "dist": "node scripts/dist.js"
+    "dist": "node scripts/dist.js",
+    "release-notes": "node scripts/release-notes.js"
   },
   "dependencies": {
     "ical.js": "2.2.1",

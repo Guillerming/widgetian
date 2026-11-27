@@ -1,4 +1,4 @@
-// The Updates group of General: the daily check, and the version there is to install. The main
+// The Updates group of About: the daily check, and the version there is to install. The main
 // process (src/main/updater.js) owns the state; this only shows it and redraws its own rows as it
 // changes, so a download in progress does not redraw the whole page.
 import { h, replace } from "../../shared/dom.js";
