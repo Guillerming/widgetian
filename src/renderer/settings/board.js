@@ -1,4 +1,4 @@
-// The Layout board: one lane per column with a chip per widget (disabled ones dimmed), and the
+// The Layout board: one lane per column with a chip per widget, and the
 // palette of widget types. Drag chips between and within lanes, or types from the palette into a
 // lane; click a chip to open its settings. With the keyboard: Option + arrows move the focused chip.
 import { CATALOG } from "../../shared/catalog.js";
@@ -50,7 +50,7 @@ const chip = (ctx, widget) => {
     {
       class: "chip",
       draggable: true,
-      dataset: { id: widget.id, enabled: String(widget.enabled) },
+      dataset: { id: widget.id },
       onDragstart: (event) => {
         event.dataTransfer.setData(WIDGET_DRAG, widget.id);
         event.dataTransfer.effectAllowed = "move";
@@ -68,7 +68,6 @@ const chip = (ctx, widget) => {
         onKeydown: (event) => moveWithKeys(ctx, widget, event),
       },
       h("span", { class: "chip-label" }, CATALOG[widget.type]?.name ?? widget.type, name ? h("small", {}, name) : null),
-      widget.enabled ? null : h("span", { class: "chip-state" }, "Hidden"),
     ),
     h(
       "button",

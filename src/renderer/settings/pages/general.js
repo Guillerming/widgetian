@@ -59,7 +59,7 @@ export const generalPage = (ctx) => {
   ];
   const iconsHelp = [
     "While Widgetian is open. Your files stay in the Desktop folder; the Finder widget opens it.",
-    ctx.config.wallpaper.mode === "off" ? "With Widgetian's wallpaper off, macOS shows them again when you click the desktop." : "",
+    ctx.config.wallpaper.mode === "system" ? "With the system's wallpaper, macOS shows them again when you click the desktop." : "",
   ].join(" ").trim();
   const chooseDisplay = (value) => {
     if (!value.startsWith("one:")) return set({ display: value });

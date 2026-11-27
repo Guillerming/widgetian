@@ -123,3 +123,34 @@ export const DEFAULT_THEME_ID = "big-sur";
  */
 export const findTheme = (id) =>
   THEMES.find((theme) => theme.id === id) ?? THEMES.find((theme) => theme.id === DEFAULT_THEME_ID);
+
+/** How the user's own gradients move: like Big Sur. */
+export const CUSTOM_MOTION = findTheme(DEFAULT_THEME_ID).motion;
+export const MAX_CUSTOM_THEMES = 12;
+export const isCustomThemeId = (id) => /^custom(-[a-z0-9]{1,24})?$/.test(String(id));
+
+/**
+ * Every gradient the user can pick: the built-in themes, then their own. `hidden` ones stay listed
+ * in Settings but are not offered anywhere else.
+ * @param {{ customThemes: { id: string, name: string, colors: string[] }[], hiddenThemes: string[] }} wallpaper
+ * @returns {(Theme & { custom: boolean, hidden: boolean })[]}
+ */
+export const gradientsOf = (wallpaper) => {
+  const hidden = new Set(wallpaper.hiddenThemes ?? []);
+  return [
+    ...THEMES.map((theme) => ({ ...theme, custom: false, hidden: hidden.has(theme.id) })),
+    ...(wallpaper.customThemes ?? []).map(({ id, name, colors }) => ({
+      id,
+      name,
+      origin: "",
+      colors,
+      motion: CUSTOM_MOTION,
+      custom: true,
+      hidden: hidden.has(id),
+    })),
+  ];
+};
+
+/** The gradient with this id, or the default theme. */
+export const gradientOf = (wallpaper, id) =>
+  gradientsOf(wallpaper).find((theme) => theme.id === id) ?? { ...findTheme(DEFAULT_THEME_ID), custom: false, hidden: false };

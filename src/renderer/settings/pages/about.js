@@ -30,7 +30,7 @@ export const aboutPage = (ctx) =>
         {},
         h("h1", {}, "Widgetian"),
         h("p", {}, "Glass desktop widgets for macOS. Free and open source, under the MIT license."),
-        h("p", { class: "about-author" }, "Made by Guillermo, ", external("https://guillerming.es", "Guillerming"), "."),
+        h("p", { class: "about-author" }, "By ", external("https://guillerming.es", "Guillerming")),
       ),
     ),
     updatesGroup(ctx),

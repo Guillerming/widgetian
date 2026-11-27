@@ -1,7 +1,8 @@
 // The wallpaper window (one per display, under the Finder's icons):
 //   gradient → an animated mesh gradient (Paper Shaders) that cross-fades between themes;
-//   images   → a folder of pictures, cross-fading every few minutes, with an optional effect.
-import { THEMES, findTheme } from "../../shared/wallpaper-themes.js";
+//   images   → a folder of pictures, changing every few minutes with an optional effect; each effect
+//              has its own entrance (see wallpaper.css).
+import { gradientOf } from "../../shared/wallpaper-themes.js";
 import { h } from "../shared/dom.js";
 import { blendUniforms, easeInOutCubic, lerp } from "./blend.js";
 import { meshUniforms } from "./mesh.js";
@@ -11,8 +12,9 @@ import { meshGradientFragmentShader } from "./vendor/paper-shaders/shaders/mesh-
 const api = window.widgetian;
 const TRANSITION_MS = 1600;
 const IMAGE_FADE_MS = 1800;
+// The picture underneath goes a little after the new one is fully in, never before.
+const REMOVE_MARGIN_MS = 300;
 const MAX_PIXEL_COUNT = 1200 * 1200 * 2;
-const CUSTOM_MOTION = THEMES.find((theme) => theme.id === "big-sur").motion;
 const stage = document.getElementById("stage");
 
 let wallpaper = null;
@@ -24,10 +26,7 @@ let shader = null;
 let shown = null;
 let frame = 0;
 
-const themeOf = (settings) =>
-  settings.theme === "custom"
-    ? { id: "custom", colors: settings.customColors, motion: CUSTOM_MOTION }
-    : findTheme(settings.theme);
+const themeOf = (settings) => gradientOf(settings, settings.theme);
 
 const speedFactor = (settings) => (settings.pauseOnBattery && onBattery ? 0 : settings.speed);
 
@@ -85,14 +84,20 @@ let imageTimer = null;
 /** Each start gets a number, so an answer that arrives late (another folder by now) is ignored. */
 let imageRun = 0;
 
+const setLook = (layer, settings) => {
+  layer.dataset.effect = settings.imageEffect;
+  layer.dataset.breathe = String(settings.imageBreathing);
+};
+
+/** The new picture enters with its effect's animation (wallpaper.css) over the one before. */
 const addImageLayer = (layer) => {
-  layer.dataset.effect = wallpaper.imageEffect;
+  setLook(layer, wallpaper);
+  stage.style.setProperty("--image-fade", `${IMAGE_FADE_MS}ms`);
   stage.append(layer);
-  requestAnimationFrame(() => layer.classList.add("visible"));
-  // Drop what was there once the new picture has faded in.
+  // Drop what was there once the new picture is in.
   setTimeout(() => {
     while (layer.parentNode === stage && layer.previousSibling) layer.previousSibling.remove();
-  }, IMAGE_FADE_MS);
+  }, IMAGE_FADE_MS + REMOVE_MARGIN_MS);
 };
 
 /** The next picture that loads; one that does not (broken, unsupported) is skipped. */
@@ -100,7 +105,9 @@ const showNextImage = (run, attempts = images.length) => {
   if (run !== imageRun || attempts <= 0) return;
   imageIndex = (imageIndex + 1) % images.length;
   const img = h("img", { alt: "", src: `media://image/${images[imageIndex].id}` });
-  img.addEventListener("load", () => run === imageRun && addImageLayer(h("div", { class: "layer image" }, img)));
+  // The second copy, more blurred, fades in and out over the first for the breathing blur.
+  const soft = h("img", { alt: "", class: "soft", src: img.src });
+  img.addEventListener("load", () => run === imageRun && addImageLayer(h("div", { class: "layer image" }, img, soft)));
   img.addEventListener("error", () => showNextImage(run, attempts - 1));
 };
 
@@ -145,8 +152,8 @@ const applyImages = (next, previous) => {
     return startImages();
   }
   // The same pictures: change only what changed, without starting over.
-  if (previous.imageEffect !== next.imageEffect) {
-    for (const layer of stage.querySelectorAll(".layer.image")) layer.dataset.effect = next.imageEffect;
+  if (previous.imageEffect !== next.imageEffect || previous.imageBreathing !== next.imageBreathing) {
+    for (const layer of stage.querySelectorAll(".layer.image")) setLook(layer, next);
   }
   if (previous.imageMinutes !== next.imageMinutes && images.length > 0) scheduleImages();
   return undefined;

@@ -14,6 +14,8 @@ const setProp = (element, key, value) => {
   } else if (key === "dataset") Object.assign(element.dataset, value);
   else if (key.startsWith("on") && typeof value === "function") element.addEventListener(key.slice(2).toLowerCase(), value);
   else if (key === "ref" && typeof value === "function") value(element);
+  // Boolean properties (disabled, checked, draggable…) are set as such: draggable="" would mean "auto".
+  else if (value === true && typeof element[key] === "boolean") element[key] = true;
   else if (value === true) element.setAttribute(key, "");
   else if (key in element && !(element instanceof SVGElement) && key !== "list") element[key] = value;
   else element.setAttribute(key, String(value));

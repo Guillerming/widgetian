@@ -1,7 +1,7 @@
 import { CATALOG } from "../../../shared/catalog.js";
 import { createWidget, insertWidget } from "../../../shared/config.js";
 import { h } from "../../shared/dom.js";
-import { renderField, row, toggle } from "../fields.js";
+import { renderField } from "../fields.js";
 import { group, page, widgetTitle } from "../kit.js";
 
 const api = window.widgetian;
@@ -56,7 +56,6 @@ export const widgetPage = (ctx, id) => {
     page(
       widgetTitle(widget),
       type.description,
-      group("", row("Show on the desktop", toggle(widget.enabled, (enabled) => change((entry) => ({ ...entry, enabled }))))),
       type.fields.length ? group("Settings", ...type.fields.map((field) => renderField(field, widget.settings[field.key], setSetting(field.key)))) : null,
       widget.type === "ai" ? statuslineHelp(ctx) : null,
       h(

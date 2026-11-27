@@ -5,7 +5,7 @@
 // defaults, numbers are clamped. Functions never mutate their input.
 import { CATALOG } from "./catalog.js";
 import { normalizeStatusSettings } from "./status-config.js";
-import { THEMES, DEFAULT_THEME_ID } from "./wallpaper-themes.js";
+import { DEFAULT_THEME_ID, MAX_CUSTOM_THEMES, THEMES, isCustomThemeId } from "./wallpaper-themes.js";
 
 export const CONFIG_VERSION = 1;
 export const MAX_COLUMNS = 8;
@@ -22,33 +22,36 @@ const DEFAULT_GENERAL = {
   displayLabel: "",
 };
 const DEFAULT_LAYOUT = { columns: 5, edge: 24, gap: 12 };
-export const WALLPAPER_MODES = ["off", "gradient", "images"];
+// "system": no wallpaper of Widgetian's, so macOS shows its own (called "off" before 0.2.2).
+export const WALLPAPER_MODES = ["system", "gradient", "images"];
 export const IMAGE_EFFECTS = ["none", "dim", "blur", "drift"];
 const DEFAULT_WALLPAPER = {
   mode: "gradient",
   theme: DEFAULT_THEME_ID,
-  customColors: ["#fa4b3e", "#ff9a54", "#85c8e8", "#285c9e"],
+  // The user's own gradients: { id: "custom-…", name, colors: four "#rrggbb" }.
+  customThemes: [],
+  // Gradients the user hid: still in Settings, no longer offered by the wallpaper picker.
+  hiddenThemes: [],
   // Multiplies each theme's own animation speed: 0 = still, 1 = as designed, 2 = twice as fast.
   speed: 1,
   imagesFolder: "",
   imageMinutes: 30,
   imageEffect: "none",
+  // With the blur effect: the blur slowly deepens and eases.
+  imageBreathing: true,
   pauseOnBattery: false,
 };
 
 /** The widgets a new user sees. Column/order give the starting layout. */
 const STARTER_WIDGETS = [
-  ["clock", 1, 1, true],
-  ["weather", 1, 2, true],
-  ["power", 1, 3, true],
-  ["system", 3, 3, false],
-  ["music", 1, 4, false],
-  ["wallpaper-picker", 1, 5, true],
-  ["calendar", 2, 1, true],
-  ["todo", 2, 2, true],
-  ["ai", 2, 3, false],
-  ["status", 3, 1, true],
-  ["finder", 3, 2, true],
+  ["clock", 1, 1],
+  ["weather", 1, 2],
+  ["power", 1, 3],
+  ["wallpaper-picker", 1, 4],
+  ["calendar", 2, 1],
+  ["todo", 2, 2],
+  ["status", 3, 1],
+  ["finder", 3, 2],
 ];
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -65,7 +68,6 @@ const randomId = () => Math.random().toString(36).slice(2, 8);
 export const createWidget = (type, column = 1, order = 1, id = `${type}-${randomId()}`) => ({
   id,
   type,
-  enabled: true,
   column,
   order,
   settings: structuredClone(CATALOG[type].defaults),
@@ -76,10 +78,7 @@ export const defaultConfig = () => ({
   general: { ...DEFAULT_GENERAL },
   layout: { ...DEFAULT_LAYOUT },
   wallpaper: structuredClone(DEFAULT_WALLPAPER),
-  widgets: STARTER_WIDGETS.map(([type, column, order, enabled]) => ({
-    ...createWidget(type, column, order, type),
-    enabled,
-  })),
+  widgets: STARTER_WIDGETS.map(([type, column, order]) => createWidget(type, column, order, type)),
 });
 
 /** Settings merged over the type's defaults; nested plain objects (e.g. location) merge one level. */
@@ -99,7 +98,8 @@ const normalizeWidgets = (widgets, columns) => {
   if (!Array.isArray(widgets)) return defaultConfig().widgets;
   const seen = new Set();
   return widgets
-    .filter((widget) => isObject(widget) && Object.hasOwn(CATALOG, widget.type))
+    // Before 0.2.2 a widget could stay in the layout hidden (enabled: false); now it is deleted instead.
+    .filter((widget) => isObject(widget) && Object.hasOwn(CATALOG, widget.type) && widget.enabled !== false)
     .map((widget, index) => {
       let id = text(widget.id) || `${widget.type}-${index + 1}`;
       while (seen.has(id)) id = `${id}-${index + 1}`;
@@ -107,7 +107,6 @@ const normalizeWidgets = (widgets, columns) => {
       return {
         id,
         type: widget.type,
-        enabled: widget.enabled !== false,
         column: clamp(widget.column, 1, columns, 1),
         order: Number.isFinite(Number(widget.order)) ? Number(widget.order) : index + 1,
         settings: normalizeSettings(widget.type, widget.settings),
@@ -115,23 +114,35 @@ const normalizeWidgets = (widgets, columns) => {
     });
 };
 
+const isColors = (colors) => Array.isArray(colors) && colors.length === 4 && colors.every((color) => /^#[0-9a-f]{6}$/i.test(color));
+
+/** The user's gradients. Before 0.2.2 there was one, as `customColors`: it becomes "Custom". */
+const normalizeCustomThemes = (given) => {
+  const list = Array.isArray(given.customThemes)
+    ? given.customThemes
+    : isColors(given.customColors) ? [{ id: "custom", name: "Custom", colors: given.customColors }] : [];
+  const seen = new Set();
+  return list
+    .filter((theme) => isObject(theme) && isCustomThemeId(theme.id) && isColors(theme.colors) && !seen.has(theme.id) && seen.add(theme.id))
+    .slice(0, MAX_CUSTOM_THEMES)
+    .map((theme) => ({ id: theme.id, name: text(theme.name).trim().slice(0, 40) || "Custom", colors: theme.colors.map((color) => color.toLowerCase()) }));
+};
+
 const normalizeWallpaper = (raw) => {
   const given = isObject(raw) ? raw : {};
-  const colors =
-    Array.isArray(given.customColors) &&
-    given.customColors.length === 4 &&
-    given.customColors.every((color) => /^#[0-9a-f]{6}$/i.test(color))
-      ? [...given.customColors]
-      : [...DEFAULT_WALLPAPER.customColors];
+  const customThemes = normalizeCustomThemes(given);
+  const ids = [...THEMES.map((theme) => theme.id), ...customThemes.map((theme) => theme.id)];
   const speed = Number(given.speed);
   return {
-    mode: oneOf(given.mode, WALLPAPER_MODES, DEFAULT_WALLPAPER.mode),
-    theme: oneOf(given.theme, [...THEMES.map((theme) => theme.id), "custom"], DEFAULT_WALLPAPER.theme),
-    customColors: colors,
+    mode: oneOf(given.mode === "off" ? "system" : given.mode, WALLPAPER_MODES, DEFAULT_WALLPAPER.mode),
+    theme: oneOf(given.theme, ids, DEFAULT_WALLPAPER.theme),
+    customThemes,
+    hiddenThemes: Array.isArray(given.hiddenThemes) ? [...new Set(given.hiddenThemes.filter((id) => ids.includes(id)))] : [],
     speed: Number.isFinite(speed) ? Math.min(2, Math.max(0, speed)) : DEFAULT_WALLPAPER.speed,
     imagesFolder: text(given.imagesFolder),
     imageMinutes: clamp(given.imageMinutes, 1, 24 * 60, DEFAULT_WALLPAPER.imageMinutes),
     imageEffect: oneOf(given.imageEffect, IMAGE_EFFECTS, DEFAULT_WALLPAPER.imageEffect),
+    imageBreathing: given.imageBreathing !== false,
     pauseOnBattery: given.pauseOnBattery === true,
   };
 };
@@ -167,11 +178,11 @@ export const normalizeConfig = (raw) => {
   };
 };
 
-/** Enabled widgets grouped by column (index 0 = column 1), each column sorted by order. */
+/** Widgets grouped by column (index 0 = column 1), each column sorted by order. */
 export const columnsOf = (config) => {
   const columns = Array.from({ length: config.layout.columns }, () => []);
   for (const widget of config.widgets) {
-    if (widget.enabled) columns[widget.column - 1].push(widget);
+    columns[widget.column - 1].push(widget);
   }
   return columns.map((column) => column.sort((a, b) => a.order - b.order));
 };

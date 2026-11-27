@@ -26,7 +26,7 @@ Widgetian starts at login (turn it off in **General**). It has no Dock icon.
 | Clock | Time, seconds and date, in any time zone. Add several for several cities. | 12/24 h, time zone, date format |
 | Weather | Now and the next days, from Open-Meteo (no account). | Automatic location or a city |
 | Power | Battery rings for this Mac and connected Bluetooth devices. | — |
-| System | CPU load per core and temperature (Apple silicon), memory as Activity Monitor counts it, free disk space as Finder counts it. | Off by default: add it in **Layout** |
+| System | CPU load per core and temperature (Apple silicon), memory as Activity Monitor counts it, free disk space as Finder counts it. | Not on the desktop at first: add it in **Layout** |
 | Music | Plays a folder of songs: shuffle, artist lock, media keys, Now Playing. | A music folder |
 | Wallpaper picker | Swatches to switch the gradient wallpaper from the desktop. | — |
 | Calendar | Today's and the next days' events, the current one highlighted. | iCal addresses (Google, iCloud, Outlook…) |
@@ -36,8 +36,9 @@ Widgetian starts at login (turn it off in **General**). It has no Dock icon.
 | Service status | Anything about a website or service: health checks, Umami visits, your own JavaScript, in tabs. | Blocks (below) |
 
 The **wallpaper** is drawn by Widgetian, under your desktop icons or over them to hide them: an animated mesh gradient (eight
-themes inspired by classic macOS wallpapers, or your own four colours), a folder of pictures with an
-optional effect, or off.
+themes inspired by classic macOS wallpapers, plus gradients of your own; any of them can be hidden), a
+folder of pictures with an optional effect and its own transition, or **System**, which leaves the
+macOS wallpaper untouched.
 
 ### Service status
 

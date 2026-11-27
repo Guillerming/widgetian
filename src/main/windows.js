@@ -82,7 +82,7 @@ const createDesktopWindow = (kind, display, level) => {
 /** Which displays get which windows for this config. */
 const wantedWindows = (config) => {
   const displays = screen.getAllDisplays();
-  const wallpapers = config.wallpaper.mode === "off" ? [] : displays;
+  const wallpapers = config.wallpaper.mode === "system" ? [] : displays;
   return [
     ...wallpapers.map((display) => ({ kind: "wallpaper", display })),
     ...widgetDisplays(displays, screen.getPrimaryDisplay().id, config.general).map((display) => ({ kind: "widgets", display })),

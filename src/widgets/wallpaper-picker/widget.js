@@ -1,6 +1,6 @@
 // Wallpaper picker: one swatch per gradient theme. Picking one saves it and the wallpaper
 // cross-fades to it on every screen. Hovering a swatch previews its name.
-import { THEMES } from "../../shared/wallpaper-themes.js";
+import { gradientsOf } from "../../shared/wallpaper-themes.js";
 import { h, replace } from "../../renderer/shared/dom.js";
 import { card } from "../../renderer/shared/ui.js";
 
@@ -22,16 +22,15 @@ export function mount(root, ctx) {
   let wallpaper = null;
   let previewId = null;
 
+  /** Hidden gradients are not offered, unless it is the one on screen. */
   const themesShown = () =>
-    wallpaper?.customColors
-      ? [...THEMES, { id: "custom", name: "Custom", origin: "Your colours", colors: wallpaper.customColors }]
-      : THEMES;
+    wallpaper ? gradientsOf(wallpaper).filter((theme) => !theme.hidden || (wallpaper.mode === "gradient" && theme.id === wallpaper.theme)) : [];
 
   const label = () => {
     const id = previewId ?? (wallpaper?.mode === "gradient" ? wallpaper.theme : null);
     const theme = themesShown().find((entry) => entry.id === id);
-    if (!theme) return shell.setAside(wallpaper?.mode === "images" ? "Images" : "Off");
-    return shell.setAside(h("strong", {}, theme.name), h("small", {}, theme.origin));
+    if (!theme) return shell.setAside(wallpaper?.mode === "images" ? "Images" : "System");
+    return shell.setAside(h("strong", {}, theme.name), theme.origin ? h("small", {}, theme.origin) : null);
   };
 
   const preview = (id) => {
@@ -50,7 +49,7 @@ export function mount(root, ctx) {
       role: "radio",
       class: "swatch",
       "aria-checked": String(theme.id === current),
-      "aria-label": `${theme.name}, ${theme.origin}`,
+      "aria-label": theme.origin ? `${theme.name}, ${theme.origin}` : theme.name,
       style: { background: swatchBackground(theme.colors) },
       onMouseenter: () => preview(theme.id),
       onFocus: () => preview(theme.id),

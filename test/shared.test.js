@@ -15,7 +15,7 @@ describe("catalog", () => {
   }
 
   test("a new user gets the Finder widget", () => {
-    assert.ok(defaultConfig().widgets.some((widget) => widget.type === "finder" && widget.enabled));
+    assert.ok(defaultConfig().widgets.some((widget) => widget.type === "finder"));
   });
 });
 
@@ -63,7 +63,7 @@ describe("normalizeConfig", () => {
   test("rejects malformed wallpaper colours and unknown modes", () => {
     const config = normalizeConfig({ wallpaper: { mode: "video", customColors: ["red", "#000000"] } });
     assert.equal(config.wallpaper.mode, "gradient");
-    assert.equal(config.wallpaper.customColors.length, 4);
+    assert.deepEqual(config.wallpaper.customThemes, []);
   });
 
   test("does not mutate its input", () => {
@@ -81,14 +81,15 @@ describe("layout helpers", () => {
       { id: "a", type: "clock", column: 1, order: 1 },
       { id: "b", type: "weather", column: 1, order: 2 },
       { id: "c", type: "todo", column: 2, order: 1 },
-      { id: "d", type: "power", column: 1, order: 3, enabled: false },
+      { id: "d", type: "power", column: 1, order: 3 },
+      { id: "e", type: "music", column: 2, order: 2, enabled: false },
     ],
   });
 
-  test("columnsOf lists enabled widgets per column in order", () => {
+  test("columnsOf lists the widgets per column in order; hidden ones from older versions are dropped", () => {
     assert.deepEqual(
       columnsOf(config).map((column) => column.map((widget) => widget.id)),
-      [["a", "b"], ["c"], []],
+      [["a", "b", "d"], ["c"], []],
     );
   });
 

@@ -2,7 +2,7 @@
 // (preload.cjs); every request is checked here before it touches the disk, the shell or the network.
 import { app, clipboard, dialog, ipcMain, powerMonitor, shell } from "electron";
 import { updateWidgetSettings } from "../shared/config.js";
-import { THEMES } from "../shared/wallpaper-themes.js";
+import { gradientsOf } from "../shared/wallpaper-themes.js";
 import { PRODUCT } from "./product.js";
 import { resourceFile } from "./resources.js";
 import { readSource, defaultClaudeLimitsFile } from "./sources/index.js";
@@ -103,7 +103,8 @@ export const registerIpc = ({ store }) => {
   });
 
   handle("wallpaper:set-theme", (_event, themeId) => {
-    if (!THEMES.some((theme) => theme.id === themeId) && themeId !== "custom") throw new Error("Unknown theme");
+    const theme = gradientsOf(store.get().wallpaper).find((entry) => entry.id === themeId);
+    if (!theme || theme.hidden) throw new Error("Unknown theme");
     return store.update((config) => ({ ...config, wallpaper: { ...config.wallpaper, mode: "gradient", theme: themeId } }));
   });
 

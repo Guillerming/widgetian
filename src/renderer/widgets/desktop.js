@@ -1,4 +1,4 @@
-// The widgets window: lays out the enabled widgets in columns and keeps them in sync with
+// The widgets window: lays out the widgets in columns and keeps them in sync with
 // config.json. A widget is remounted only when its own settings (or the general settings) change,
 // so ticking a to-do item does not restart the music player.
 import { columnsOf, uses12h } from "../../shared/config.js";

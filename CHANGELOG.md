@@ -3,6 +3,20 @@
 What changed in each version of Widgetian. The newest comes first; each release on GitHub uses its
 section as release notes (`npm run release-notes`).
 
+## 0.2.2 (2026-11-27)
+
+- **Layout: drag and drop works.** Drag a widget from "Add a widget" into a column, between
+  columns, or up and down within one.
+- **Wallpaper "System"** replaces "Off": macOS shows the wallpaper you chose in System Settings, untouched.
+- **Gradients of your own.** Make as many as you like, name them and delete them. Any gradient, built-in
+  or your own, can be hidden: it stays in Settings but the Wallpaper picker widget no longer offers it.
+- **Images: transitions.** Each effect brings its own way of changing pictures: a cross-fade, rising out
+  of the dark (Dim), coming into focus (Blur) or settling in from a little closer (Slow drift).
+- **Images: breathing blur.** With Blur, the blur slowly deepens and eases. On by default.
+- No more hidden widgets: a widget is on the desktop or deleted. Hidden ones from earlier versions are
+  removed, and new users no longer get Music, AI usage and System hidden in their layout.
+- About reads "By Guillerming"; the sidebar items no longer touch each other.
+
 ## 0.2.1 (2026-11-27)
 
 - **About.** A new page at the top of Settings: who makes Widgetian, links to the code, the author's
